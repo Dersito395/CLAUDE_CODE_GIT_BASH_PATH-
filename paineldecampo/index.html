@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Painel de Campo — Registro de Campanha</title>
+<meta name="description" content="Registro rápido de atividades de campanha e acompanhamento local." />
+<meta name="theme-color" content="#1B2A4A" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Painel de Campo" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2A4A;
+    --ink-soft: #4C5A78;
+    --ink-mute: #6E7A93;
+    --paper: #ECE8DC;
+    --card: #FFFFFF;
+    --mustard: #C98A2B;
+    --mustard-deep: #A8701E;
+    --green: #3F6644;
+    --green-soft: #EAF0EA;
+    --brick: #A3432F;
+    --brick-soft: #F6EAE6;
+    --line: #D9D3C4;
+    --line-strong: #C4BCA6;
+    --focus: #C98A2B;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #D8D3C3;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px 0;
+  }
+  #app {
+    width: 100%;
+    max-width: 480px;
+    background: var(--paper);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 90vh;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(27,42,74,0.18);
+  }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  /* ---------- Header ---------- */
+  header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--card);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mustard-deep);
+    margin: 0 0 4px;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.05;
+  }
+  .sub { font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 0; }
+
+  .countdown {
+    flex: 0 0 auto; text-align: center; border-radius: 12px; padding: 9px 11px;
+    border: 1px solid var(--line); background: #FBFAF6; min-width: 74px; cursor: pointer;
+  }
+  .countdown:hover { border-color: var(--line-strong); }
+  .countdown-num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 20px; line-height: 1; display: block; }
+  .countdown-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); display: block; margin-top: 4px; font-weight: 600; }
+  .countdown.ok .countdown-num { color: var(--green); }
+  .countdown.warn .countdown-num { color: var(--mustard-deep); }
+  .countdown.urgent .countdown-num { color: var(--brick); }
+  .countdown.urgent { background: var(--brick-soft); border-color: #E4C9C1; }
+
+  #body { flex: 1; padding: 16px; padding-bottom: 96px; overflow-y: auto; }
+
+  /* ---------- Banner ---------- */
+  .banner {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: #FBF1DE; border: 1px solid #E6CF9E; border-radius: 12px;
+    padding: 12px 13px; margin-bottom: 14px; font-size: 12.5px; line-height: 1.45; color: #6A4B12;
+  }
+  .banner svg { flex: 0 0 auto; margin-top: 1px; color: var(--mustard-deep); }
+  .banner strong { display: block; margin-bottom: 2px; }
+  .banner-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .banner-link {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font: inherit; font-weight: 600; color: var(--mustard-deep); text-decoration: underline;
+  }
+
+  /* ---------- Chips ---------- */
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    display: flex; align-items: center; gap: 7px; flex: 0 0 auto;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13.5px;
+    text-transform: uppercase; letter-spacing: 0.02em;
+    padding: 8px 13px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--card); color: var(--ink); cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .chip:hover { border-color: var(--ink-soft); }
+  .chip svg { width: 15px; height: 15px; color: var(--ink-soft); }
+  .chip-count {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600;
+    background: var(--paper); color: var(--ink-soft); border-radius: 999px; padding: 1px 6px; min-width: 20px; text-align: center;
+  }
+  .chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .chip.active svg { color: rgba(255,255,255,0.75); }
+  .chip.active .chip-count { background: rgba(255,255,255,0.18); color: #fff; }
+
+  /* ---------- Cards & form ---------- */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+  .card.flush { padding: 6px 14px; }
+  .field { margin-bottom: 14px; }
+  .field:last-of-type { margin-bottom: 14px; }
+  label { display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); margin-bottom: 6px; }
+  .req { color: var(--brick); }
+  input, select, textarea {
+    width: 100%; border: 1px solid var(--line-strong); background: #FBFAF6; border-radius: 9px;
+    padding: 11px 12px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--mustard); }
+  input.invalid, select.invalid { border-color: var(--brick); background: var(--brick-soft); }
+  .field-error { font-size: 11.5px; color: var(--brick); margin-top: 5px; font-weight: 500; }
+
+  .edit-note {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: #EEF1F7; border: 1px solid #CFD8E8; border-radius: 10px;
+    padding: 9px 12px; margin-bottom: 14px; font-size: 12.5px; color: var(--ink);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: 1px solid transparent; border-radius: 10px; padding: 12px 14px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15.5px;
+    text-transform: uppercase; letter-spacing: 0.03em; background: var(--mustard); color: #fff;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .btn:hover { background: var(--mustard-deep); }
+  .btn-block { width: 100%; }
+  .btn-outline { background: var(--card); border-color: var(--line-strong); color: var(--ink); }
+  .btn-outline:hover { background: #F6F3EC; border-color: var(--ink-soft); }
+  .btn-ghost { background: none; border-color: transparent; color: var(--ink-soft); }
+  .btn-ghost:hover { background: #E4DFD1; color: var(--ink); }
+  .btn-danger { background: var(--card); border-color: #E0BFB6; color: var(--brick); }
+  .btn-danger:hover { background: var(--brick-soft); }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-row .btn { flex: 1; }
+  .btn svg { width: 17px; height: 17px; }
+
+  .error { font-size: 12.5px; color: var(--brick); margin: 10px 0 0; text-align: center; }
+  .error:empty { margin: 0; }
+
+  /* ---------- Photo picker ---------- */
+  .photo-picker { display: flex; align-items: center; gap: 10px; }
+  .photo-btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    border: 1px dashed var(--line-strong); background: #FBFAF6; border-radius: 9px;
+    padding: 11px 13px; font-size: 13.5px; color: var(--ink-soft); font-weight: 500; flex: 1;
+  }
+  .photo-btn:hover { border-color: var(--mustard); color: var(--ink); }
+  .photo-preview { position: relative; flex: 0 0 auto; }
+  .photo-preview img { width: 62px; height: 62px; object-fit: cover; border-radius: 9px; border: 1px solid var(--line-strong); display: block; }
+  .photo-remove {
+    position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brick); color: #fff; border: 2px solid var(--card); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .photo-remove svg { width: 11px; height: 11px; }
+
+  /* ---------- Search & entries ---------- */
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 4px 0 10px; }
+  .section-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-soft); margin: 0; }
+  .section-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-mute); }
+
+  .search-wrap { position: relative; margin-bottom: 10px; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-mute); pointer-events: none; }
+  .search-wrap input { padding-left: 36px; padding-right: 36px; font-size: 14px; }
+  .search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 5px; display: flex; }
+  .search-clear svg { position: static; transform: none; width: 13px; height: 13px; }
+
+  .entry { display: flex; align-items: center; gap: 10px; padding: 11px 4px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .entry:last-child { border-bottom: none; }
+  .entry-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line-strong); flex: 0 0 auto; cursor: pointer; display: block; }
+  .entry-main { flex: 1; min-width: 0; }
+  .entry-title { font-weight: 600; display: block; overflow-wrap: anywhere; }
+  .entry-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-soft); display: block; margin-top: 2px; overflow-wrap: anywhere; }
+  .entry-actions { display: flex; gap: 2px; flex: 0 0 auto; }
+  .icon-btn { background: none; border: none; color: var(--ink-mute); cursor: pointer; padding: 7px; border-radius: 8px; display: flex; }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn:hover { color: var(--ink); background: #F1EEE5; }
+  .icon-btn.danger:hover { color: var(--brick); background: var(--brick-soft); }
+
+  .empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 26px 12px; text-align: center; color: var(--ink-mute); font-size: 13px; }
+  .empty svg { width: 30px; height: 30px; color: var(--line-strong); }
+
+  .more-btn { width: 100%; background: none; border: none; border-top: 1px solid var(--line); padding: 11px; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+  .more-btn:hover { color: var(--ink); background: #FAF8F3; }
+
+  /* ---------- Dashboard ---------- */
+  .segmented { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 4px; margin-bottom: 14px; }
+  .seg-btn { flex: 1; border: none; background: none; cursor: pointer; padding: 8px 4px; border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-soft); }
+  .seg-btn.active { background: var(--ink); color: #fff; }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  /* flex + space-between mantém os valores alinhados na base mesmo quando
+     o rótulo do card vizinho ocupa duas linhas */
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .stat-head { display: flex; align-items: center; gap: 6px; margin: 0 0 7px; }
+  .stat-head svg { width: 14px; height: 14px; color: var(--ink-mute); flex: 0 0 auto; }
+  .stat-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); font-weight: 600; margin: 0; }
+  .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: var(--ink); margin: 0; overflow-wrap: anywhere; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.brick { color: var(--brick); }
+
+  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 12px 12px; margin-bottom: 16px; }
+  .chart-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 10px; padding-left: 4px; }
+  .chart-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-mute); padding: 22px 4px; text-align: center; }
+  .chart-empty svg { width: 26px; height: 26px; color: var(--line-strong); }
+  svg.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+  svg.chart .axis-label { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; fill: var(--ink-mute); }
+  svg.chart .value-label { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; fill: var(--ink-soft); }
+
+  /* ---------- Settings (Dados) ---------- */
+  .set-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 4px; }
+  .set-desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 12px; }
+  .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .set-row:last-child { border-bottom: none; }
+  .set-row-label { font-weight: 500; }
+  .set-row-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-mute); display: block; margin-top: 2px; }
+  .meter { height: 6px; border-radius: 999px; background: var(--paper); overflow: hidden; margin: 8px 0 6px; }
+  .meter span { display: block; height: 100%; background: var(--green); border-radius: 999px; }
+  .meter span.warn { background: var(--mustard); }
+  .meter span.full { background: var(--brick); }
+
+  /* ---------- Nav ---------- */
+  nav { position: absolute; bottom: 0; left: 0; right: 0; display: flex; background: var(--card); border-top: 1px solid var(--line); padding: 9px 12px calc(9px + env(safe-area-inset-bottom)); gap: 8px; }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 6px 0; border-radius: 10px; color: var(--ink-soft); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn.active { color: var(--mustard-deep); }
+  .nav-btn svg { width: 20px; height: 20px; }
+
+  /* ---------- Stamp, toast, modal, lightbox ---------- */
+  .stamp-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 40; }
+  .stamp {
+    width: 132px; height: 132px; border-radius: 50%; border: 4px solid var(--mustard);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--mustard);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    background: rgba(255,255,255,0.95); opacity: 0; animation: stampIn .55s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  .stamp span:first-child { font-size: 15px; }
+  .stamp span:last-child { font-size: 10px; letter-spacing: 0.1em; margin-top: 2px; color: var(--ink-soft); }
+  @keyframes stampIn {
+    0% { transform: scale(0.4) rotate(-18deg); opacity: 0; }
+    55% { transform: scale(1.08) rotate(-8deg); opacity: 1; }
+    75% { transform: scale(0.96) rotate(-10deg); }
+    100% { transform: scale(1) rotate(-9deg); opacity: 1; }
+  }
+
+  #toasts { position: absolute; left: 12px; right: 12px; bottom: 84px; z-index: 60; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .toast {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--ink); color: #fff; border-radius: 11px; padding: 12px 14px;
+    font-size: 13.5px; box-shadow: 0 6px 18px rgba(27,42,74,0.28); pointer-events: auto;
+    animation: toastIn .22s ease forwards;
+  }
+  .toast.erro { background: var(--brick); }
+  .toast.ok { background: var(--green); }
+  .toast-action {
+    background: none; border: none; color: #fff; cursor: pointer; flex: 0 0 auto;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 0.05em; text-decoration: underline; padding: 2px 0;
+  }
+  @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  .backdrop { position: absolute; inset: 0; background: rgba(27,42,74,0.45); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 70; }
+  .modal { background: var(--card); border-radius: 14px; padding: 20px; width: 100%; max-width: 340px; }
+  .modal h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 8px; }
+  .modal p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 14px; }
+  .modal .btn-row { flex-direction: column; }
+
+  .lightbox { position: absolute; inset: 0; background: rgba(27,42,74,0.85); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 80; cursor: zoom-out; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ---------- Print ---------- */
+  .print-only { display: none; }
+  @media print {
+    body { background: #fff; padding: 0; display: block; }
+    #app { max-width: none; min-height: auto; border-radius: 0; box-shadow: none; background: #fff; }
+    #body { padding: 0 12px 12px; overflow: visible; }
+    nav, .no-print, #toasts { display: none !important; }
+    .print-only { display: block; }
+    .card, .stat, .chart-card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <p class="eyebrow" id="eyebrow">Registro de Campanha</p>
+      <h1>Painel de Campo</h1>
+      <p class="sub">Preenchimento rápido de atividades e acompanhamento local.</p>
+    </div>
+    <button class="countdown no-print" id="countdown" type="button" title="Alterar data da eleição"></button>
+  </header>
+  <main id="body"></main>
+  <nav id="nav" class="no-print"></nav>
+  <div id="toasts" aria-live="polite"></div>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   Constantes e catálogo de tipos
+   ========================================================= */
+const STORAGE_KEY  = "campanha-dados-local";
+const SETTINGS_KEY = "campanha-config-local";
+const SCHEMA_VERSION = 2;
+const PAGE_SIZE = 8;
+const PHOTO_MAX_PX = 900;
+const PHOTO_QUALITY = 0.72;
+const STORAGE_BUDGET = 4.5 * 1024 * 1024; // referência prática do limite de ~5MB do localStorage
+const BACKUP_ALERTA_DIAS = 7;
+
+const ICONS = {
+  users:    '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.6a3 3 0 0 1 0 5.5"/><path d="M18.6 14.3c1.5.8 2.4 2.2 2.4 3.8"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  wallet:   '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><circle cx="17" cy="14.5" r="1.3"/>',
+  megaphone:'<path d="M4 10v4a1 1 0 0 0 1 1h2l7 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M17.5 9.2a4 4 0 0 1 0 5.6"/>',
+  check:    '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.9"/>',
+  flyer:    '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+  clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6M9 18h3"/>',
+  chart:    '<path d="M3 21h18"/><path d="M6 21v-8M11 21V5M16 21v-6M21 21v-11"/>',
+  database: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+  trash:    '<path d="M4 7h16"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l.9 13h9.2l.9-13"/><path d="M10 11v5M14 11v5"/>',
+  edit:     '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14.5 5.5l4 4"/>',
+  camera:   '<path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7l1.6-2h6.8L17 7h2.5A1.5 1.5 0 0 1 21 8.5v10A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z"/><circle cx="12" cy="13" r="3.4"/>',
+  download: '<path d="M12 4v11"/><path d="M7.5 11L12 15.5 16.5 11"/><path d="M5 20h14"/>',
+  upload:   '<path d="M12 20V9"/><path d="M7.5 13L12 8.5 16.5 13"/><path d="M5 4h14"/>',
+  printer:  '<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+  search:   '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.6-4.6"/>',
+  alert:    '<path d="M12 3.5l9.2 16.5H2.8z"/><path d="M12 10v4"/><path d="M12 17.2v.3"/>',
+  inbox:    '<path d="M4 6h16l1.5 7v5H2.5v-5z"/><path d="M2.5 13H8l1.6 2.6h4.8L16 13h5.5"/>',
+  x:        '<path d="M6 6l12 12M18 6L6 18"/>',
+  vote:     '<path d="M20 6L9 17l-5-5"/>',
+};
+
+function icon(name, size) {
+  size = size || 18;
+  return '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" fill="none" stroke="currentColor" ' +
+         'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || "") + "</svg>";
+}
+
+const TYPES = [
+  { key: "apoiadores", label: "Apoiadores", icon: "users", fields: [
+    { name: "nome",   label: "Nome",   type: "text", required: true },
+    { name: "funcao", label: "Função", type: "text", required: true },
+  ]},
+  { key: "reunioes", label: "Reuniões", icon: "calendar", fields: [
+    { name: "data",       label: "Data",                 type: "date",   required: true },
+    { name: "nome",       label: "Responsável / local",  type: "text",   required: true },
+    { name: "quantidade", label: "Reuniões realizadas",  type: "number", required: true, min: 0, step: "1" },
+    { name: "foto",       label: "Foto (evidência)",     type: "photo" },
+  ]},
+  { key: "financeiro", label: "Financeiro", icon: "wallet", fields: [
+    { name: "data",      label: "Data",       type: "date",   required: true },
+    { name: "tipo",      label: "Tipo",       type: "select", required: true, options: ["Entrada","Saída"] },
+    { name: "valor",     label: "Valor (R$)", type: "number", required: true, min: 0, step: "0.01" },
+    { name: "atividade", label: "Atividade",  type: "text",   required: true },
+  ]},
+  { key: "redes", label: "Redes sociais", icon: "megaphone", fields: [
+    { name: "data",            label: "Data",       type: "date",   required: true },
+    { name: "plataforma",      label: "Plataforma", type: "select", required: true, options: ["Instagram","Facebook","WhatsApp","TikTok","Outro"] },
+    { name: "engajamento",     label: "Engajamento (curtidas+coment.+compart.)", type: "number", required: true, min: 0, step: "1" },
+    { name: "seguidoresNovos", label: "Novos seguidores", type: "number", min: 0, step: "1" },
+  ]},
+  { key: "votos", label: "Votos convertidos", icon: "check", fields: [
+    { name: "data",        label: "Data",        type: "date",   required: true },
+    { name: "quantidade",  label: "Quantidade",  type: "number", required: true, min: 0, step: "1" },
+    { name: "responsavel", label: "Responsável", type: "text" },
+  ]},
+  { key: "panfletagem", label: "Panfletagem", icon: "flyer", fields: [
+    { name: "data",        label: "Data",                type: "date",   required: true },
+    { name: "local",       label: "Bairro / local",      type: "text",   required: true },
+    { name: "quantidade",  label: "Panfletos entregues", type: "number", required: true, min: 0, step: "1" },
+    { name: "voluntarios", label: "Nº de voluntários",   type: "number", min: 0, step: "1" },
+    { name: "foto",        label: "Foto (evidência)",    type: "photo" },
+  ]},
+];
+
+const TYPE_BY_KEY = {};
+TYPES.forEach(function (t) { TYPE_BY_KEY[t.key] = t; });
+
+const PERIODOS = [
+  { key: "7",   label: "7 dias" },
+  { key: "30",  label: "30 dias" },
+  { key: "90",  label: "90 dias" },
+  { key: "all", label: "Tudo" },
+];
+
+/* =========================================================
+   Utilitários
+   ========================================================= */
+function esc(v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function norm(v) {
+  return String(v == null ? "" : v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function uid() {
+  return Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+}
+/* Data local — toISOString() usa UTC e adiantaria o dia à noite no Brasil. */
+function todayISO(d) {
+  d = d || new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function parseISODate(iso) {
+  if (!iso) return null;
+  const p = String(iso).slice(0, 10).split("-");
+  if (p.length !== 3) return null;
+  const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  return isNaN(d.getTime()) ? null : d;
+}
+function fmtBRL(n) {
+  return (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+function fmtNum(n) {
+  return (Number(n) || 0).toLocaleString("pt-BR");
+}
+function fmtDateShort(iso) {
+  if (!iso) return "";
+  const p = String(iso).slice(0, 10).split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] : "";
+}
+function fmtDateBR(iso) {
+  if (!iso) return "";
+  const p = String(iso).slice(0, 10).split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : "";
+}
+function fmtDateTimeBR(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+function diffDias(isoA, isoB) {
+  const a = parseISODate(isoA), b = parseISODate(isoB);
+  if (!a || !b) return null;
+  return Math.round((a - b) / 86400000);
+}
+function bytesLegivel(b) {
+  if (b < 1024) return b + " B";
+  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + " KB";
+  return (b / 1024 / 1024).toFixed(1) + " MB";
+}
+function downloadFile(nome, conteudo, mime) {
+  const blob = new Blob([conteudo], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+/* =========================================================
+   Persistência
+   ========================================================= */
+function dadosVazios() {
+  const o = {};
+  TYPES.forEach(function (t) { o[t.key] = []; });
+  return o;
+}
+
+/* Garante id e carimbo de criação em todo registro — o filtro de período
+   depende de uma data, e "apoiadores" não tem campo de data próprio. */
+function migrar(dados) {
+  const base = dadosVazios();
+  if (!dados || typeof dados !== "object") return base;
+  TYPES.forEach(function (t) {
+    const lista = Array.isArray(dados[t.key]) ? dados[t.key] : [];
+    base[t.key] = lista.filter(function (i) { return i && typeof i === "object"; }).map(function (item) {
+      if (!item.id) item.id = uid();
+      if (!item.criadoEm) item.criadoEm = item.data ? item.data + "T12:00:00.000Z" : new Date().toISOString();
+      return item;
+    });
+  });
+  return base;
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return migrar(JSON.parse(raw));
+  } catch (e) { /* dado corrompido: começa vazio em vez de quebrar a tela */ }
+  return dadosVazios();
+}
+
+function loadSettings() {
+  const padrao = { eleicaoData: "2026-10-04", ultimoBackup: null };
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) return Object.assign(padrao, JSON.parse(raw));
+  } catch (e) {}
+  return padrao;
+}
+
+function saveSettings() {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings)); } catch (e) {}
+}
+
+/* Devolve false quando o navegador recusa a gravação (cota estourada),
+   para que quem chamou possa desfazer a alteração em memória. */
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+    return true;
+  } catch (e) {
+    toast("Armazenamento cheio. Exporte um backup e remova fotos antigas.", { tipo: "erro", ms: 9000 });
+    return false;
+  }
+}
+
+function tamanhoArmazenado() {
+  try { return new Blob([JSON.stringify(state.data)]).size; } catch (e) { return 0; }
+}
+
+function totalRegistros() {
+  return TYPES.reduce(function (s, t) { return s + state.data[t.key].length; }, 0);
+}
+
+/* =========================================================
+   Estado
+   ========================================================= */
+const state = {
+  tab: "form",
+  activeType: TYPES[0].key,
+  data: loadData(),
+  settings: loadSettings(),
+  editingId: null,
+  busca: "",
+  visiveis: PAGE_SIZE,
+  periodo: "30",
+  fotoRascunho: null,
+};
+
+let undoPendente = null;
+
+/* =========================================================
+   Toast / modal / lightbox
+   ========================================================= */
+function toast(texto, opts) {
+  opts = opts || {};
+  const el = document.createElement("div");
+  el.className = "toast" + (opts.tipo ? " " + opts.tipo : "");
+  el.innerHTML = "<span>" + esc(texto) + "</span>";
+  if (opts.acao) {
+    const btn = document.createElement("button");
+    btn.className = "toast-action";
+    btn.type = "button";
+    btn.textContent = opts.acao;
+    btn.addEventListener("click", function () {
+      el.remove();
+      if (opts.onAcao) opts.onAcao();
+    });
+    el.appendChild(btn);
+  }
+  document.getElementById("toasts").appendChild(el);
+  setTimeout(function () { el.remove(); }, opts.ms || 4000);
+}
+
+/* Modal genérico: resolve com a chave do botão escolhido (ou null no cancelamento).
+   Quando `confirmar` é informado, o botão principal só libera com o texto exato. */
+function modal(cfg) {
+  return new Promise(function (resolve) {
+    const back = document.createElement("div");
+    back.className = "backdrop";
+    const botoes = cfg.botoes.map(function (b) {
+      return '<button class="btn ' + (b.classe || "btn-outline") + '" data-key="' + esc(b.key) + '">' + esc(b.label) + "</button>";
+    }).join("");
+    back.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        "<h3>" + esc(cfg.titulo) + "</h3>" +
+        (cfg.texto ? "<p>" + esc(cfg.texto) + "</p>" : "") +
+        (cfg.confirmar ? '<input id="modalConfirm" type="text" placeholder="' + esc(cfg.confirmar) + '" autocomplete="off" style="margin-bottom:14px" />' : "") +
+        (cfg.campoData ? '<input id="modalDate" type="date" value="' + esc(cfg.campoData) + '" style="margin-bottom:14px" />' : "") +
+        '<div class="btn-row">' + botoes + '<button class="btn btn-ghost" data-key="">Cancelar</button></div>' +
+      "</div>";
+    document.getElementById("app").appendChild(back);
+
+    function fechar(valor) { back.remove(); resolve(valor); }
+    back.addEventListener("click", function (ev) {
+      if (ev.target === back) return fechar(null);
+      const btn = ev.target.closest("button[data-key]");
+      if (!btn) return;
+      const key = btn.getAttribute("data-key");
+      if (!key) return fechar(null);
+      if (cfg.confirmar) {
+        const campo = back.querySelector("#modalConfirm");
+        if (campo.value.trim().toUpperCase() !== cfg.confirmar.toUpperCase()) {
+          campo.classList.add("invalid");
+          campo.focus();
+          return;
+        }
+      }
+      const dt = back.querySelector("#modalDate");
+      fechar(dt ? { key: key, valor: dt.value } : key);
+    });
+    const foco = back.querySelector("#modalConfirm") || back.querySelector("#modalDate") || back.querySelector("button[data-key]");
+    if (foco) foco.focus();
+  });
+}
+
+function abrirFoto(src) {
+  const box = document.createElement("div");
+  box.className = "lightbox";
+  box.innerHTML = '<img src="' + esc(src) + '" alt="Foto do registro" />';
+  box.addEventListener("click", function () { box.remove(); });
+  document.getElementById("app").appendChild(box);
+}
+
+function showStamp() {
+  const wrap = document.createElement("div");
+  wrap.className = "stamp-wrap";
+  wrap.innerHTML = '<div class="stamp"><span>✔ Registrado</span><span>' + fmtDateBR(todayISO()) + "</span></div>";
+  document.getElementById("app").appendChild(wrap);
+  setTimeout(function () { wrap.remove(); }, 900);
+}
+
+/* =========================================================
+   Registros: consulta, ordenação, filtro
+   ========================================================= */
+function dataDoRegistro(item) {
+  return item.data || String(item.criadoEm || "").slice(0, 10);
+}
+
+function ordenados(typeKey) {
+  return state.data[typeKey].slice().sort(function (a, b) {
+    const d = dataDoRegistro(b).localeCompare(dataDoRegistro(a));
+    return d !== 0 ? d : String(b.criadoEm || "").localeCompare(String(a.criadoEm || ""));
+  });
+}
+
+/* Quebra o registro em palavras normalizadas. A data entra separada
+   ("01/09/2026" vira 01, 09, 2026) para poder ser buscada por partes. */
+function tokensBusca(type, item) {
+  const partes = type.fields
+    .filter(function (f) { return f.type !== "photo"; })
+    .map(function (f) { return f.type === "date" ? fmtDateBR(item[f.name]) : item[f.name]; });
+  return norm(partes.join(" ")).split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+/* Cada termo precisa iniciar alguma palavra do registro. Buscar por
+   substring solta faria "bairro 1" casar com tudo, já que toda data
+   contém o dígito 1 em algum lugar. */
+function filtrarPorBusca(type, lista) {
+  const termos = norm(state.busca).split(/[^a-z0-9]+/).filter(Boolean);
+  if (termos.length === 0) return lista;
+  return lista.filter(function (item) {
+    const tokens = tokensBusca(type, item);
+    return termos.every(function (t) {
+      return tokens.some(function (tok) { return tok.indexOf(t) === 0; });
+    });
+  });
+}
+
+function noPeriodo(item) {
+  if (state.periodo === "all") return true;
+  const d = parseISODate(dataDoRegistro(item));
+  if (!d) return true;
+  const limite = new Date();
+  limite.setHours(0, 0, 0, 0);
+  limite.setDate(limite.getDate() - (Number(state.periodo) - 1));
+  return d >= limite;
+}
+
+function dadosDoPeriodo() {
+  const out = {};
+  TYPES.forEach(function (t) { out[t.key] = state.data[t.key].filter(noPeriodo); });
+  return out;
+}
+
+function entryTitle(typeKey, item) {
+  switch (typeKey) {
+    case "apoiadores":  return (item.nome || "—") + " · " + (item.funcao || "—");
+    case "reunioes":    return item.nome || "Reunião";
+    case "financeiro":  return item.atividade || "Lançamento";
+    case "redes":       return item.plataforma || "Publicação";
+    case "votos":       return item.responsavel || "Votos registrados";
+    case "panfletagem": return item.local || "Panfletagem";
+    default:            return "Registro";
+  }
+}
+function entryMeta(typeKey, item) {
+  const d = fmtDateBR(item.data);
+  switch (typeKey) {
+    case "apoiadores":  return "apoiador(a) · desde " + fmtDateBR(dataDoRegistro(item));
+    case "reunioes":    return d + " · " + fmtNum(item.quantidade) + " reunião(ões)";
+    case "financeiro":  return d + " · " + (item.tipo || "—") + " · " + fmtBRL(item.valor);
+    case "redes":       return d + " · " + fmtNum(item.engajamento) + " interações" +
+                               (Number(item.seguidoresNovos) ? " · +" + fmtNum(item.seguidoresNovos) + " seg." : "");
+    case "votos":       return d + " · " + fmtNum(item.quantidade) + " voto(s)";
+    case "panfletagem": return d + " · " + fmtNum(item.quantidade) + " panfletos · " + fmtNum(item.voluntarios) + " voluntário(s)";
+    default:            return d;
+  }
+}
+
+/* =========================================================
+   Formulário
+   ========================================================= */
+function fieldHTML(field, valor) {
+  const id = "f_" + field.name;
+  if (field.type === "select") {
+    const opcoes = field.options.map(function (o) {
+      return '<option value="' + esc(o) + '"' + (valor === o ? " selected" : "") + ">" + esc(o) + "</option>";
+    }).join("");
+    return '<select id="' + id + '" name="' + esc(field.name) + '">' +
+             '<option value=""' + (valor ? "" : " selected") + " disabled>Selecionar…</option>" + opcoes +
+           "</select>";
+  }
+  if (field.type === "photo") {
+    return '<div class="photo-picker" id="photoPicker">' +
+             '<input type="file" id="photoInput" accept="image/*" capture="environment" class="visually-hidden" />' +
+             '<label class="photo-btn" for="photoInput">' + icon("camera", 18) + "<span>" + (valor ? "Trocar foto" : "Adicionar foto") + "</span></label>" +
+             (valor
+               ? '<div class="photo-preview"><img src="' + esc(valor) + '" alt="Pré-visualização da foto" />' +
+                 '<button type="button" class="photo-remove" data-action="remover-foto" aria-label="Remover foto">' + icon("x", 11) + "</button></div>"
+               : "") +
+           "</div>";
+  }
+  const v = valor != null ? valor : (field.type === "date" ? todayISO() : "");
+  const extra =
+    (field.type === "number" ? ' inputmode="decimal"' : "") +
+    (field.min != null ? ' min="' + field.min + '"' : "") +
+    (field.step ? ' step="' + field.step + '"' : "");
+  return '<input id="' + id + '" name="' + esc(field.name) + '" type="' + field.type + '"' + extra + ' value="' + esc(v) + '" />';
+}
+
+function renderCampos(type, item) {
+  return type.fields.map(function (f) {
+    const valor = item ? item[f.name] : (f.type === "photo" ? state.fotoRascunho : undefined);
+    return '<div class="field" data-field="' + esc(f.name) + '">' +
+             '<label for="f_' + esc(f.name) + '">' + esc(f.label) + (f.required ? ' <span class="req">*</span>' : "") + "</label>" +
+             fieldHTML(f, valor) +
+           "</div>";
+  }).join("");
+}
+
+function itemEmEdicao() {
+  if (!state.editingId) return null;
+  return state.data[state.activeType].find(function (i) { return i.id === state.editingId; }) || null;
+}
+
+function bannerBackup() {
+  if (totalRegistros() === 0) return "";
+  const ultimo = state.settings.ultimoBackup;
+  if (ultimo) {
+    const dias = diffDias(todayISO(), String(ultimo).slice(0, 10));
+    if (dias != null && dias < BACKUP_ALERTA_DIAS) return "";
+  }
+  return '<div class="banner no-print">' + icon("alert", 17) +
+           "<div><strong>Seus dados estão só neste navegador.</strong>" +
+           "Limpar o cache, trocar de aparelho ou reinstalar apaga tudo. " +
+           (ultimo ? "Último backup em " + esc(fmtDateTimeBR(ultimo)) + "." : "Você ainda não fez nenhum backup.") +
+           '<div class="banner-actions">' +
+             '<button class="banner-link" data-action="exportar-json">Exportar backup agora</button>' +
+           "</div></div>" +
+         "</div>";
+}
+
+function renderChips() {
+  return TYPES.map(function (t) {
+    const n = state.data[t.key].length;
+    return '<button class="chip' + (t.key === state.activeType ? " active" : "") + '" data-action="tipo" data-key="' + t.key + '" ' +
+             'aria-pressed="' + (t.key === state.activeType) + '">' +
+             icon(t.icon, 15) + "<span>" + esc(t.label) + '</span><span class="chip-count">' + n + "</span>" +
+           "</button>";
+  }).join("");
+}
+
+function renderEntries() {
+  const type = TYPE_BY_KEY[state.activeType];
+  const todos = ordenados(type.key);
+  const filtrados = filtrarPorBusca(type, todos);
+  const pagina = filtrados.slice(0, state.visiveis);
+
+  if (todos.length === 0) {
+    return '<div class="empty">' + icon("inbox", 30) + "<span>Nenhum registro ainda em " + esc(type.label.toLowerCase()) + ".</span></div>";
+  }
+  if (filtrados.length === 0) {
+    return '<div class="empty">' + icon("search", 30) + "<span>Nada encontrado para “" + esc(state.busca) + "”.</span></div>";
+  }
+
+  const linhas = pagina.map(function (item) {
+    return '<div class="entry">' +
+             (item.foto ? '<img class="entry-thumb" src="' + esc(item.foto) + '" alt="Foto do registro" data-action="ver-foto" data-id="' + esc(item.id) + '" />' : "") +
+             '<div class="entry-main">' +
+               '<span class="entry-title">' + esc(entryTitle(type.key, item)) + "</span>" +
+               '<span class="entry-meta">' + esc(entryMeta(type.key, item)) + "</span>" +
+             "</div>" +
+             '<div class="entry-actions no-print">' +
+               '<button class="icon-btn" data-action="editar" data-id="' + esc(item.id) + '" aria-label="Editar registro">' + icon("edit", 16) + "</button>" +
+               '<button class="icon-btn danger" data-action="excluir" data-id="' + esc(item.id) + '" aria-label="Excluir registro">' + icon("trash", 16) + "</button>" +
+             "</div>" +
+           "</div>";
+  }).join("");
+
+  const restantes = filtrados.length - pagina.length;
+  const mais = restantes > 0
+    ? '<button class="more-btn no-print" data-action="mais">Mostrar mais ' + Math.min(restantes, PAGE_SIZE) + " de " + restantes + "</button>"
+    : "";
+  return linhas + mais;
+}
+
+function renderContagem() {
+  const type = TYPE_BY_KEY[state.activeType];
+  const total = state.data[type.key].length;
+  const filtrados = filtrarPorBusca(type, state.data[type.key]).length;
+  if (total === 0) return "";
+  return state.busca ? filtrados + " de " + total : String(total) + " registro" + (total === 1 ? "" : "s");
+}
+
+function renderForm() {
+  const type = TYPE_BY_KEY[state.activeType];
+  const editando = itemEmEdicao();
+
+  const acoes = editando
+    ? '<div class="btn-row">' +
+        '<button class="btn btn-ghost" type="button" data-action="cancelar-edicao">Cancelar</button>' +
+        '<button class="btn" type="submit">Salvar alterações</button>' +
+      "</div>"
+    : '<button class="btn btn-block" type="submit">' + icon("check", 17) + " Registrar</button>";
+
+  return bannerBackup() +
+    '<div class="chips no-print">' + renderChips() + "</div>" +
+    '<form class="card no-print" id="entryForm" novalidate>' +
+      (editando ? '<div class="edit-note"><span>Editando um registro existente</span></div>' : "") +
+      renderCampos(type, editando) +
+      acoes +
+      '<p class="error" id="formError" role="alert"></p>' +
+    "</form>" +
+    '<div class="section-head">' +
+      '<p class="section-label">Registros · ' + esc(type.label) + "</p>" +
+      '<span class="section-count" id="entriesCount">' + esc(renderContagem()) + "</span>" +
+    "</div>" +
+    '<div class="search-wrap no-print">' + icon("search", 16) +
+      '<input id="searchInput" type="search" placeholder="Buscar nos registros…" value="' + esc(state.busca) + '" aria-label="Buscar nos registros" />' +
+      (state.busca ? '<button class="search-clear" type="button" data-action="limpar-busca" aria-label="Limpar busca">' + icon("x", 13) + "</button>" : "") +
+    "</div>" +
+    '<div class="card flush" id="entriesBox">' + renderEntries() + "</div>";
+}
+
+function atualizarListaEContagem() {
+  const box = document.getElementById("entriesBox");
+  if (box) box.innerHTML = renderEntries();
+  const cnt = document.getElementById("entriesCount");
+  if (cnt) cnt.textContent = renderContagem();
+  document.querySelectorAll(".chip").forEach(function (chip) {
+    const key = chip.getAttribute("data-key");
+    const alvo = chip.querySelector(".chip-count");
+    if (key && alvo) alvo.textContent = state.data[key].length;
+  });
+}
+
+/* ---- Fotos ---- */
+function lerFoto(file) {
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = function () {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = function () {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > PHOTO_MAX_PX || h > PHOTO_MAX_PX) {
+          const escala = PHOTO_MAX_PX / Math.max(w, h);
+          w = Math.round(w * escala);
+          h = Math.round(h * escala);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", PHOTO_QUALITY));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function atualizarPickerFoto() {
+  const campo = document.querySelector('[data-field="foto"]');
+  if (!campo) return;
+  const type = TYPE_BY_KEY[state.activeType];
+  const field = type.fields.find(function (f) { return f.name === "foto"; });
+  const label = campo.querySelector("label");
+  campo.innerHTML = label.outerHTML + fieldHTML(field, state.fotoRascunho);
+}
+
+async function onEscolherFoto(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  try {
+    state.fotoRascunho = await lerFoto(file);
+    atualizarPickerFoto();
+  } catch (e) {
+    toast("Não foi possível ler a imagem.", { tipo: "erro" });
+  }
+  input.value = "";
+}
+
+/* ---- Submissão ---- */
+function handleSubmit(form) {
+  const type = TYPE_BY_KEY[state.activeType];
+  const erroEl = document.getElementById("formError");
+  let faltando = 0;
+  const valores = {};
+
+  type.fields.forEach(function (f) {
+    const campo = form.querySelector('[data-field="' + f.name + '"]');
+    const antigo = campo && campo.querySelector(".field-error");
+    if (antigo) antigo.remove();
+
+    if (f.type === "photo") { valores[f.name] = state.fotoRascunho || ""; return; }
+
+    const input = form.elements[f.name];
+    const val = (input.value || "").trim();
+    input.classList.remove("invalid");
+
+    if (f.required && !val) {
+      faltando++;
+      input.classList.add("invalid");
+      campo.insertAdjacentHTML("beforeend", '<p class="field-error">Campo obrigatório.</p>');
+      return;
+    }
+    if (f.type === "number" && val !== "" && (isNaN(Number(val)) || Number(val) < 0)) {
+      faltando++;
+      input.classList.add("invalid");
+      campo.insertAdjacentHTML("beforeend", '<p class="field-error">Informe um número igual ou maior que zero.</p>');
+      return;
+    }
+    valores[f.name] = val;
+  });
+
+  if (faltando > 0) {
+    erroEl.textContent = "Revise os campos destacados antes de salvar.";
+    const primeiro = form.querySelector(".invalid");
+    if (primeiro) primeiro.focus();
+    return;
+  }
+  erroEl.textContent = "";
+
+  const lista = state.data[type.key];
+  if (state.editingId) {
+    const idx = lista.findIndex(function (i) { return i.id === state.editingId; });
+    if (idx < 0) return;
+    const anterior = lista[idx];
+    lista[idx] = Object.assign({}, anterior, valores, { editadoEm: new Date().toISOString() });
+    if (!saveData()) { lista[idx] = anterior; return; }
+    state.editingId = null;
+    state.fotoRascunho = null;
+    render();
+    toast("Registro atualizado.", { tipo: "ok" });
+    return;
+  }
+
+  const novo = Object.assign({ id: uid(), criadoEm: new Date().toISOString() }, valores);
+  lista.unshift(novo);
+  if (!saveData()) { lista.shift(); return; }
+
+  state.fotoRascunho = null;
+  state.visiveis = PAGE_SIZE;
+  showStamp();
+  render();
+  const primeiroCampo = document.querySelector("#entryForm input:not([type=file]), #entryForm select");
+  if (primeiroCampo) primeiroCampo.focus();
+}
+
+function iniciarEdicao(id) {
+  state.editingId = id;
+  const item = itemEmEdicao();
+  state.fotoRascunho = item && item.foto ? item.foto : null;
+  render();
+  document.getElementById("body").scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function cancelarEdicao() {
+  state.editingId = null;
+  state.fotoRascunho = null;
+  render();
+}
+
+/* ---- Exclusão com desfazer ---- */
+function handleDelete(typeKey, id) {
+  const lista = state.data[typeKey];
+  const idx = lista.findIndex(function (i) { return i.id === id; });
+  if (idx < 0) return;
+  const removido = lista[idx];
+  lista.splice(idx, 1);
+  if (!saveData()) { lista.splice(idx, 0, removido); return; }
+
+  if (state.editingId === id) { state.editingId = null; state.fotoRascunho = null; render(); }
+  else atualizarListaEContagem();
+
+  undoPendente = { typeKey: typeKey, item: removido, idx: idx };
+  toast("Registro excluído.", {
+    acao: "Desfazer",
+    ms: 7000,
+    onAcao: function () {
+      if (!undoPendente) return;
+      const alvo = state.data[undoPendente.typeKey];
+      alvo.splice(Math.min(undoPendente.idx, alvo.length), 0, undoPendente.item);
+      undoPendente = null;
+      if (saveData()) { atualizarListaEContagem(); toast("Exclusão desfeita.", { tipo: "ok" }); }
+    },
+  });
+}
+
+/* =========================================================
+   Painel
+   ========================================================= */
+function computeTotals(d) {
+  const apoiadores = d.apoiadores.length;
+  const reunioes   = d.reunioes.reduce(function (s, r) { return s + (Number(r.quantidade) || 0); }, 0);
+  const entradas   = d.financeiro.filter(function (f) { return f.tipo === "Entrada"; }).reduce(function (s, f) { return s + (Number(f.valor) || 0); }, 0);
+  const saidas     = d.financeiro.filter(function (f) { return f.tipo === "Saída"; }).reduce(function (s, f) { return s + (Number(f.valor) || 0); }, 0);
+  const votos      = d.votos.reduce(function (s, v) { return s + (Number(v.quantidade) || 0); }, 0);
+  const panfletos  = d.panfletagem.reduce(function (s, p) { return s + (Number(p.quantidade) || 0); }, 0);
+  const engajamento = d.redes.reduce(function (s, r) { return s + (Number(r.engajamento) || 0); }, 0);
+  const diasPanfletagem = new Set(d.panfletagem.map(function (p) { return p.data; })).size;
+  return {
+    apoiadores: apoiadores, reunioes: reunioes, entradas: entradas, saidas: saidas,
+    saldo: entradas - saidas, votos: votos, panfletos: panfletos,
+    engajamento: engajamento, diasPanfletagem: diasPanfletagem,
+  };
+}
+
+function barChartSVG(dataArr, key, cor) {
+  if (dataArr.length === 0) return null;
+  const w = 420, h = 158, padX = 20, padTop = 18, padBottom = 22;
+  const max = Math.max.apply(null, dataArr.map(function (d) { return d[key]; }).concat([1]));
+  const gap = (w - padX * 2) / dataArr.length;
+  const barW = Math.min(gap * 0.62, 46);
+  const alturaUtil = h - padTop - padBottom;
+  let corpo = "";
+  dataArr.forEach(function (d, i) {
+    const barH = Math.max((d[key] / max) * alturaUtil, d[key] > 0 ? 2 : 0);
+    const x = padX + i * gap + (gap - barW) / 2;
+    const y = h - padBottom - barH;
+    corpo += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="3" fill="' + cor + '"></rect>';
+    if (dataArr.length <= 12) {
+      corpo += '<text class="value-label" x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle">' + fmtNum(d[key]) + "</text>";
+    }
+    if (dataArr.length <= 14 || i % Math.ceil(dataArr.length / 8) === 0 || i === dataArr.length - 1) {
+      corpo += '<text class="axis-label" x="' + (x + barW / 2) + '" y="' + (h - 6) + '" text-anchor="middle">' + esc(d.label) + "</text>";
+    }
+  });
+  return '<svg class="chart" viewBox="0 0 ' + w + " " + h + '" width="100%" height="168" role="img">' +
+           '<line class="grid-line" x1="' + padX + '" y1="' + (h - padBottom) + '" x2="' + (w - padX) + '" y2="' + (h - padBottom) + '"></line>' +
+           corpo +
+         "</svg>";
+}
+
+function lineChartSVG(dataArr, key, cor) {
+  if (dataArr.length === 0) return null;
+  const w = 420, h = 158, padX = 26, padTop = 18, padBottom = 22;
+  const vals = dataArr.map(function (d) { return d[key]; });
+  const max = Math.max.apply(null, vals.concat([0]));
+  const min = Math.min.apply(null, vals.concat([0]));
+  const range = (max - min) || 1;
+  const alturaUtil = h - padTop - padBottom;
+  const stepX = (w - padX * 2) / Math.max(dataArr.length - 1, 1);
+  const y = function (v) { return h - padBottom - ((v - min) / range) * alturaUtil; };
+
+  let pontos = "", bolinhas = "", rotulos = "";
+  dataArr.forEach(function (d, i) {
+    const px = dataArr.length === 1 ? w / 2 : padX + i * stepX;
+    const py = y(d[key]);
+    pontos += px + "," + py + " ";
+    bolinhas += '<circle cx="' + px + '" cy="' + py + '" r="3" fill="' + cor + '"></circle>';
+    if (i % Math.ceil(dataArr.length / 6 || 1) === 0 || i === dataArr.length - 1) {
+      rotulos += '<text class="axis-label" x="' + px + '" y="' + (h - 6) + '" text-anchor="middle">' + esc(d.label) + "</text>";
+    }
+  });
+  const zeroY = y(0);
+  /* Com um único lançamento não há linha para traçar; um traço horizontal
+     no valor lê como "saldo constante" em vez de um ponto solto no vazio. */
+  const soloLinha = dataArr.length === 1
+    ? '<line x1="' + padX + '" y1="' + y(dataArr[0][key]) + '" x2="' + (w - padX) + '" y2="' + y(dataArr[0][key]) +
+      '" stroke="' + cor + '" stroke-width="2.5" stroke-linecap="round" opacity="0.35"></line>'
+    : "";
+  return '<svg class="chart" viewBox="0 0 ' + w + " " + h + '" width="100%" height="168" role="img">' +
+           '<line class="grid-line" x1="' + padX + '" y1="' + zeroY + '" x2="' + (w - padX) + '" y2="' + zeroY + '" stroke-dasharray="3 3"></line>' +
+           soloLinha +
+           '<polyline points="' + pontos + '" fill="none" stroke="' + cor + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>' +
+           bolinhas + rotulos +
+           '<text class="value-label" x="' + (w - padX) + '" y="' + padTop + '" text-anchor="end">' + esc(fmtBRL(vals[vals.length - 1])) + "</text>" +
+         "</svg>";
+}
+
+function agrupaPorData(lista, campo) {
+  const mapa = {};
+  lista.forEach(function (i) {
+    const dia = dataDoRegistro(i);
+    mapa[dia] = (mapa[dia] || 0) + (Number(i[campo]) || 0);
+  });
+  return Object.keys(mapa).sort().map(function (k) {
+    return { label: fmtDateShort(k), valor: mapa[k] };
+  });
+}
+
+function graficoVazio(texto) {
+  return '<div class="chart-empty">' + icon("chart", 26) + "<span>" + esc(texto) + "</span></div>";
+}
+
+function statCard(iconName, label, valor, classe) {
+  return '<div class="stat">' +
+           '<div class="stat-head">' + icon(iconName, 14) + '<p class="stat-label">' + esc(label) + "</p></div>" +
+           '<p class="stat-value ' + (classe || "") + '">' + esc(valor) + "</p>" +
+         "</div>";
+}
+
+function renderDashboard() {
+  const d = dadosDoPeriodo();
+  const t = computeTotals(d);
+  const periodoLabel = (PERIODOS.find(function (p) { return p.key === state.periodo; }) || {}).label;
+
+  const panfletoArr = agrupaPorData(d.panfletagem, "quantidade");
+  const redesArr = agrupaPorData(d.redes, "engajamento");
+
+  const finPorData = {};
+  d.financeiro.forEach(function (f) {
+    const dia = dataDoRegistro(f);
+    if (!finPorData[dia]) finPorData[dia] = 0;
+    finPorData[dia] += (f.tipo === "Entrada" ? 1 : -1) * (Number(f.valor) || 0);
+  });
+  let acumulado = 0;
+  const finArr = Object.keys(finPorData).sort().map(function (k) {
+    acumulado += finPorData[k];
+    return { label: fmtDateShort(k), saldo: Math.round(acumulado * 100) / 100 };
+  });
+
+  const segmentos = PERIODOS.map(function (p) {
+    return '<button class="seg-btn' + (p.key === state.periodo ? " active" : "") + '" data-action="periodo" data-key="' + p.key + '">' + esc(p.label) + "</button>";
+  }).join("");
+
+  return '<div class="print-only" style="margin-bottom:14px">' +
+           "<h2 style=\"font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;margin:0\">Relatório de campanha</h2>" +
+           '<p style="font-size:12px;color:#4C5A78;margin:4px 0 0">Período: ' + esc(periodoLabel) + " · Emitido em " + esc(fmtDateBR(todayISO())) + "</p>" +
+         "</div>" +
+    '<div class="segmented no-print">' + segmentos + "</div>" +
+    '<div class="stat-grid">' +
+      statCard("users", "Apoiadores", fmtNum(t.apoiadores)) +
+      statCard("calendar", "Reuniões realizadas", fmtNum(t.reunioes)) +
+      statCard("wallet", "Entradas", fmtBRL(t.entradas), "green") +
+      statCard("wallet", "Saídas", fmtBRL(t.saidas), "brick") +
+      statCard("wallet", "Saldo", fmtBRL(t.saldo), t.saldo >= 0 ? "green" : "brick") +
+      statCard("check", "Votos convertidos", fmtNum(t.votos)) +
+      statCard("flyer", "Panfletos entregues", fmtNum(t.panfletos)) +
+      statCard("calendar", "Dias de panfletagem", fmtNum(t.diasPanfletagem)) +
+      statCard("megaphone", "Engajamento total", fmtNum(t.engajamento)) +
+      statCard("users", "Custo por voto", t.votos > 0 ? fmtBRL(t.saidas / t.votos) : "—") +
+    "</div>" +
+    '<div class="chart-card"><p class="chart-title">Panfletagem por dia</p>' +
+      (barChartSVG(panfletoArr, "valor", "#C98A2B") || graficoVazio("Sem registros de panfletagem no período.")) + "</div>" +
+    '<div class="chart-card"><p class="chart-title">Saldo financeiro acumulado</p>' +
+      (lineChartSVG(finArr, "saldo", "#1B2A4A") || graficoVazio("Sem lançamentos financeiros no período.")) + "</div>" +
+    '<div class="chart-card"><p class="chart-title">Engajamento em redes sociais</p>' +
+      (barChartSVG(redesArr, "valor", "#3F6644") || graficoVazio("Sem registros de redes sociais no período.")) + "</div>" +
+    '<div class="btn-row no-print" style="margin-bottom:8px">' +
+      '<button class="btn btn-outline" data-action="imprimir">' + icon("printer", 17) + " Imprimir / PDF</button>" +
+    "</div>";
+}
+
+/* =========================================================
+   Aba Dados: backup, exportação, limpeza
+   ========================================================= */
+function exportarJSON() {
+  const payload = {
+    app: "painel-de-campo",
+    version: SCHEMA_VERSION,
+    exportadoEm: new Date().toISOString(),
+    config: state.settings,
+    dados: state.data,
+  };
+  downloadFile("painel-de-campo-" + todayISO() + ".json", JSON.stringify(payload, null, 2), "application/json");
+  state.settings.ultimoBackup = new Date().toISOString();
+  saveSettings();
+  render();
+  toast("Backup exportado.", { tipo: "ok" });
+}
+
+function csvValor(valor, field) {
+  let s = valor == null ? "" : String(valor);
+  if (field.type === "number") s = s.replace(".", ",");
+  if (field.type === "date") s = fmtDateBR(s);
+  if (field.type === "photo") s = valor ? "sim" : "não";
+  if (/[;"\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function csvDoTipo(type, lista) {
+  const cabecalho = ["Registrado em"].concat(type.fields.map(function (f) { return f.label; }));
+  const linhas = [cabecalho.join(";")];
+  lista.forEach(function (item) {
+    const celulas = [fmtDateTimeBR(item.criadoEm)].concat(type.fields.map(function (f) { return csvValor(item[f.name], f); }));
+    linhas.push(celulas.join(";"));
+  });
+  return linhas.join("\r\n");
+}
+
+function exportarCSV(typeKey) {
+  if (typeKey) {
+    const type = TYPE_BY_KEY[typeKey];
+    const lista = ordenados(typeKey);
+    if (lista.length === 0) { toast("Nada para exportar em " + type.label.toLowerCase() + ".", { tipo: "erro" }); return; }
+    downloadFile("campanha-" + typeKey + "-" + todayISO() + ".csv", "\uFEFF" + csvDoTipo(type, lista), "text/csv;charset=utf-8");
+    toast("CSV de " + type.label.toLowerCase() + " exportado.", { tipo: "ok" });
+    return;
+  }
+  if (totalRegistros() === 0) { toast("Nenhum registro para exportar.", { tipo: "erro" }); return; }
+  const blocos = TYPES.filter(function (t) { return state.data[t.key].length > 0; }).map(function (t) {
+    return t.label.toUpperCase() + "\r\n" + csvDoTipo(t, ordenados(t.key));
+  });
+  downloadFile("campanha-completo-" + todayISO() + ".csv", "\uFEFF" + blocos.join("\r\n\r\n"), "text/csv;charset=utf-8");
+  toast("CSV completo exportado.", { tipo: "ok" });
+}
+
+function normalizarImportado(json) {
+  if (json && json.dados && typeof json.dados === "object") return { dados: json.dados, config: json.config };
+  if (json && typeof json === "object") return { dados: json, config: null }; // formato antigo (só os dados)
+  return null;
+}
+
+async function importarArquivo(file) {
+  let bruto;
+  try {
+    bruto = JSON.parse(await file.text());
+  } catch (e) {
+    toast("Arquivo inválido: não é um JSON legível.", { tipo: "erro", ms: 6000 });
+    return;
+  }
+  const pacote = normalizarImportado(bruto);
+  const importados = pacote ? migrar(pacote.dados) : null;
+  if (!importados) { toast("Arquivo não reconhecido.", { tipo: "erro" }); return; }
+
+  const qtd = TYPES.reduce(function (s, t) { return s + importados[t.key].length; }, 0);
+  if (qtd === 0) { toast("O arquivo não contém registros.", { tipo: "erro" }); return; }
+
+  const escolha = await modal({
+    titulo: "Importar backup",
+    texto: "O arquivo tem " + qtd + " registro(s). Você tem " + totalRegistros() + " registro(s) hoje. Como deseja continuar?",
+    botoes: [
+      { key: "mesclar",    label: "Mesclar com os atuais", classe: "btn" },
+      { key: "substituir", label: "Substituir tudo", classe: "btn-danger" },
+    ],
+  });
+  if (!escolha) return;
+
+  const anterior = state.data;
+  if (escolha === "substituir") {
+    state.data = importados;
+  } else {
+    const merge = dadosVazios();
+    TYPES.forEach(function (t) {
+      const vistos = {};
+      state.data[t.key].concat(importados[t.key]).forEach(function (item) {
+        if (vistos[item.id]) return;
+        vistos[item.id] = true;
+        merge[t.key].push(item);
+      });
+    });
+    state.data = merge;
+  }
+  if (!saveData()) { state.data = anterior; return; }
+  if (pacote.config && pacote.config.eleicaoData) {
+    state.settings.eleicaoData = pacote.config.eleicaoData;
+    saveSettings();
+  }
+  state.editingId = null;
+  state.busca = "";
+  render();
+  toast("Backup importado: " + totalRegistros() + " registro(s).", { tipo: "ok", ms: 6000 });
+}
+
+async function limparTudo() {
+  const ok = await modal({
+    titulo: "Apagar todos os dados",
+    texto: "Isso remove os " + totalRegistros() + " registros deste navegador e não pode ser desfeito. Digite APAGAR para confirmar.",
+    confirmar: "APAGAR",
+    botoes: [{ key: "sim", label: "Apagar tudo", classe: "btn-danger" }],
+  });
+  if (!ok) return;
+  state.data = dadosVazios();
+  state.editingId = null;
+  state.busca = "";
+  saveData();
+  render();
+  toast("Todos os registros foram apagados.", { tipo: "erro" });
+}
+
+async function editarDataEleicao() {
+  const r = await modal({
+    titulo: "Data da eleição",
+    texto: "Usada para o contador regressivo no topo do app.",
+    campoData: state.settings.eleicaoData || "",
+    botoes: [{ key: "salvar", label: "Salvar", classe: "btn" }],
+  });
+  if (!r || !r.valor) return;
+  state.settings.eleicaoData = r.valor;
+  saveSettings();
+  render();
+  renderHeader();
+}
+
+function renderDados() {
+  const bytes = tamanhoArmazenado();
+  const pct = Math.min(100, Math.round((bytes / STORAGE_BUDGET) * 100));
+  const classeMetro = pct > 85 ? "full" : pct > 60 ? "warn" : "";
+  const ultimo = state.settings.ultimoBackup;
+
+  const linhasCSV = TYPES.map(function (t) {
+    const n = state.data[t.key].length;
+    return '<div class="set-row">' +
+             '<span class="set-row-label">' + esc(t.label) + '<span class="set-row-meta">' + n + " registro(s)</span></span>" +
+             '<button class="btn btn-outline" data-action="csv-tipo" data-key="' + t.key + '" ' + (n === 0 ? "disabled style=\"opacity:.45\"" : "") + ">" +
+               icon("download", 16) + " CSV</button>" +
+           "</div>";
+  }).join("");
+
+  return bannerBackup() +
+    '<div class="card">' +
+      '<p class="set-title">Backup dos dados</p>' +
+      '<p class="set-desc">Tudo fica salvo apenas neste navegador. Exporte um arquivo JSON com regularidade — é ele que permite restaurar ou levar os dados para outro aparelho.</p>' +
+      '<div class="btn-row">' +
+        '<button class="btn" data-action="exportar-json">' + icon("download", 17) + " Exportar</button>" +
+        '<button class="btn btn-outline" data-action="importar-json">' + icon("upload", 17) + " Importar</button>" +
+      "</div>" +
+      '<input type="file" id="importInput" accept="application/json,.json" class="visually-hidden" />' +
+      '<div class="set-row" style="margin-top:6px">' +
+        '<span class="set-row-label">Último backup<span class="set-row-meta">' + (ultimo ? esc(fmtDateTimeBR(ultimo)) : "nunca") + "</span></span>" +
+        '<span class="set-row-meta">' + totalRegistros() + " registro(s)</span>" +
+      "</div>" +
+    "</div>" +
+
+    '<div class="card">' +
+      '<p class="set-title">Relatórios</p>' +
+      '<p class="set-desc">CSV abre no Excel e no Google Planilhas. O PDF sai do painel, respeitando o período selecionado lá.</p>' +
+      '<div class="btn-row" style="margin-bottom:6px">' +
+        '<button class="btn btn-outline" data-action="csv-tudo">' + icon("download", 17) + " CSV completo</button>" +
+        '<button class="btn btn-outline" data-action="imprimir">' + icon("printer", 17) + " PDF</button>" +
+      "</div>" +
+      linhasCSV +
+    "</div>" +
+
+    '<div class="card">' +
+      '<p class="set-title">Configurações</p>' +
+      '<div class="set-row">' +
+        '<span class="set-row-label">Data da eleição<span class="set-row-meta">' + esc(fmtDateBR(state.settings.eleicaoData) || "não definida") + "</span></span>" +
+        '<button class="btn btn-outline" data-action="editar-eleicao">Alterar</button>' +
+      "</div>" +
+      '<div style="padding:11px 0">' +
+        '<span class="set-row-label">Espaço usado</span>' +
+        '<div class="meter"><span class="' + classeMetro + '" style="width:' + Math.max(pct, 2) + '%"></span></div>' +
+        '<span class="set-row-meta">' + bytesLegivel(bytes) + " de ~" + bytesLegivel(STORAGE_BUDGET) + " (" + pct + "%). Fotos ocupam a maior parte.</span>" +
+      "</div>" +
+    "</div>" +
+
+    '<div class="card">' +
+      '<p class="set-title">Zona de risco</p>' +
+      '<p class="set-desc">Apaga todos os registros deste navegador. Exporte um backup antes.</p>' +
+      '<button class="btn btn-danger btn-block" data-action="limpar-tudo">' + icon("trash", 17) + " Apagar todos os dados</button>" +
+    "</div>";
+}
+
+/* =========================================================
+   Navegação e render
+   ========================================================= */
+const TABS = [
+  { key: "form",      label: "Formulário", icon: "clipboard" },
+  { key: "dashboard", label: "Painel",     icon: "chart" },
+  { key: "dados",     label: "Dados",      icon: "database" },
+];
+
+function setTab(tab) {
+  state.tab = tab;
+  state.editingId = null;
+  render();
+  document.getElementById("body").scrollTo({ top: 0 });
+}
+
+function setActiveType(key) {
+  state.activeType = key;
+  state.editingId = null;
+  state.busca = "";
+  state.visiveis = PAGE_SIZE;
+  state.fotoRascunho = null;
+  render();
+}
+
+function renderNav() {
+  document.getElementById("nav").innerHTML = TABS.map(function (t) {
+    return '<button class="nav-btn' + (state.tab === t.key ? " active" : "") + '" data-action="tab" data-key="' + t.key + '" ' +
+             'aria-current="' + (state.tab === t.key ? "page" : "false") + '">' + icon(t.icon, 20) + "<span>" + esc(t.label) + "</span></button>";
+  }).join("");
+}
+
+function renderHeader() {
+  const el = document.getElementById("countdown");
+  const alvo = state.settings.eleicaoData;
+  const dias = alvo ? diffDias(alvo, todayISO()) : null;
+  const ano = alvo ? String(alvo).slice(0, 4) : new Date().getFullYear();
+  document.getElementById("eyebrow").textContent = "Registro de Campanha · " + ano;
+
+  if (dias == null) {
+    el.className = "countdown no-print";
+    el.innerHTML = '<span class="countdown-num">—</span><span class="countdown-label">Definir data</span>';
+    return;
+  }
+  if (dias < 0)  { el.className = "countdown no-print"; el.innerHTML = '<span class="countdown-num">✓</span><span class="countdown-label">Eleição feita</span>'; return; }
+  if (dias === 0) { el.className = "countdown urgent no-print"; el.innerHTML = '<span class="countdown-num">Hoje</span><span class="countdown-label">Dia da eleição</span>'; return; }
+  const classe = dias <= 7 ? "urgent" : dias <= 30 ? "warn" : "ok";
+  el.className = "countdown no-print " + classe;
+  el.innerHTML = '<span class="countdown-num">' + dias + '</span><span class="countdown-label">Dias restantes</span>';
+}
+
+function render() {
+  const body = document.getElementById("body");
+  if (state.tab === "form") body.innerHTML = renderForm();
+  else if (state.tab === "dashboard") body.innerHTML = renderDashboard();
+  else body.innerHTML = renderDados();
+  renderNav();
+  renderHeader();
+
+  /* A régua de tipos rola na horizontal: sem isso o tipo selecionado pode
+     ficar fora da tela e o usuário perde a referência do que está preenchendo. */
+  const chipAtivo = body.querySelector(".chip.active");
+  if (chipAtivo) chipAtivo.scrollIntoView({ block: "nearest", inline: "center" });
+}
+
+/* =========================================================
+   Eventos (delegação — nada de onclick com dado do usuário)
+   ========================================================= */
+document.addEventListener("click", function (ev) {
+  if (ev.target.closest("#countdown")) { editarDataEleicao(); return; }
+
+  const alvo = ev.target.closest("[data-action]");
+  if (!alvo) return;
+  const acao = alvo.getAttribute("data-action");
+  const key = alvo.getAttribute("data-key");
+  const id = alvo.getAttribute("data-id");
+
+  switch (acao) {
+    case "tab":            setTab(key); break;
+    case "tipo":           setActiveType(key); break;
+    case "periodo":        state.periodo = key; render(); break;
+    case "mais":           state.visiveis += PAGE_SIZE; atualizarListaEContagem(); break;
+    case "limpar-busca":   state.busca = ""; state.visiveis = PAGE_SIZE; render(); document.getElementById("searchInput").focus(); break;
+    case "editar":         iniciarEdicao(id); break;
+    case "excluir":        handleDelete(state.activeType, id); break;
+    case "cancelar-edicao":cancelarEdicao(); break;
+    case "remover-foto":   state.fotoRascunho = null; atualizarPickerFoto(); break;
+    case "ver-foto": {
+      const item = state.data[state.activeType].find(function (i) { return i.id === id; });
+      if (item && item.foto) abrirFoto(item.foto);
+      break;
+    }
+    case "exportar-json":  exportarJSON(); break;
+    case "importar-json": {
+      if (state.tab !== "dados") { setTab("dados"); }
+      const input = document.getElementById("importInput");
+      if (input) input.click();
+      break;
+    }
+    case "csv-tipo":       exportarCSV(key); break;
+    case "csv-tudo":       exportarCSV(null); break;
+    case "editar-eleicao": editarDataEleicao(); break;
+    case "limpar-tudo":    limparTudo(); break;
+    case "imprimir":
+      if (state.tab !== "dashboard") { setTab("dashboard"); setTimeout(function () { window.print(); }, 120); }
+      else window.print();
+      break;
+  }
+});
+
+document.addEventListener("submit", function (ev) {
+  if (ev.target.id !== "entryForm") return;
+  ev.preventDefault();
+  handleSubmit(ev.target);
+});
+
+/* Busca atualiza só a lista, para não perder o foco nem o cursor. */
+document.addEventListener("input", function (ev) {
+  if (ev.target.id === "searchInput") {
+    state.busca = ev.target.value;
+    state.visiveis = PAGE_SIZE;
+    atualizarListaEContagem();
+    const wrap = ev.target.closest(".search-wrap");
+    const limpar = wrap.querySelector(".search-clear");
+    if (state.busca && !limpar) {
+      wrap.insertAdjacentHTML("beforeend",
+        '<button class="search-clear" type="button" data-action="limpar-busca" aria-label="Limpar busca">' + icon("x", 13) + "</button>");
+    } else if (!state.busca && limpar) {
+      limpar.remove();
+    }
+  }
+});
+
+document.addEventListener("change", function (ev) {
+  if (ev.target.id === "photoInput") onEscolherFoto(ev.target);
+  if (ev.target.id === "importInput") {
+    const file = ev.target.files && ev.target.files[0];
+    ev.target.value = "";
+    if (file) importarFile(file);
+  }
+});
+function importarFile(file) { importarArquivo(file); }
+
+/* =========================================================
+   Início + service worker (só quando servido por http/https)
+   ========================================================= */
+render();
+
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () { /* uso local por file:// segue normal */ });
+  });
+}
+</script>
+</body>
+</html>
