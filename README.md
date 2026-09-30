@@ -54,3 +54,21 @@ de celular ou reinstalar o navegador apaga tudo. Por isso o app avisa quando o
 
 O limite prático do `localStorage` é de cerca de 5 MB. A aba **Dados** mostra
 quanto já foi usado; as fotos são o que mais ocupa espaço.
+
+---
+
+# Fire Command — Biosite (`firecommand/`)
+
+Página de links (biosite) da Fire Command, pensada para abrir no celular a partir
+da placa NFC.
+
+| Botão | Ação |
+| --- | --- |
+| Salvar contato | Baixa `contato.vcf` — (14) 99861-9590, e-mail, Instagram e logo |
+| Pix | Abre painel com a chave (18) 99819-9298 e botão "Copiar chave" |
+| Instagram | https://www.instagram.com/firecommand_br/ |
+| E-mail | `mailto:firecommandbr@gmail.com` |
+
+Publicação: a pasta é estática (HTML + imagens). Com GitHub Pages ativo, o
+endereço fica `https://<usuario>.github.io/<repo>/firecommand/` — grave essa URL
+na tag NFC (registro do tipo URL/URI).
