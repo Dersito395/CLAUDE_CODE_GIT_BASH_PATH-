@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta name="color-scheme" content="light">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zag Modas</title>
+<meta name="description" content="Zag Modas — A moda dos que vivem.">
+<meta name="theme-color" content="#f7d9ca">
+<meta property="og:title" content="Zag Modas">
+<meta property="og:description" content="A moda dos que vivem.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" type="image/png" href="img/icone.png">
+<link rel="apple-touch-icon" href="img/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown:#946956; --brown-dark:#6f4b3c; --rose:#c99a86;
+    --ink:#4a3329; --muted:#8a6e62; --paper:#fdeee6; --blob:#f9dccd; --card:#fff7f2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:#f3d9cc; color:var(--ink);
+    display:flex; justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .page{
+    position:relative; overflow:hidden;
+    width:100%; max-width:480px; min-height:100vh; min-height:100dvh;
+    background:var(--paper);
+    padding:56px 24px calc(40px + env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; align-items:center;
+  }
+  @media (min-width:520px){ .page{box-shadow:0 0 40px rgba(111,75,60,.18)} }
+
+  /* ---------- decoração de fundo ---------- */
+  .blob{position:absolute; left:-18%; top:4%; width:136%; height:62%; z-index:0; pointer-events:none}
+  .dot{position:absolute; z-index:0; border-radius:50%; pointer-events:none}
+  .dot.a{width:180px;height:180px;background:var(--blob);top:-70px;left:-70px}
+  .dot.b{width:60px;height:60px;border:1.5px solid var(--rose);top:70px;left:40px;opacity:.6}
+  .dot.c{width:220px;height:220px;background:var(--blob);bottom:-90px;right:-90px}
+  .dot.d{width:44px;height:44px;border:1.5px solid var(--rose);bottom:120px;right:30px;opacity:.6}
+  .orn{position:absolute; z-index:0; width:34px; height:34px; pointer-events:none; color:var(--rose)}
+  .orn.s1{top:230px; left:22px}
+  .orn.s2{top:430px; right:18px; width:26px; height:26px}
+
+  .content{position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center}
+
+  /* ---------- logo em círculo ---------- */
+  .photo{
+    width:190px; height:190px; border-radius:50%;
+    border:5px solid var(--card); box-shadow:0 0 0 2px var(--rose), 0 12px 30px rgba(148,105,86,.3);
+    background:#ffe3d5;
+  }
+  .photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+
+  /* ---------- nome / lema ---------- */
+  h1{
+    font-family:"Playfair Display",Georgia,serif; font-weight:600;
+    font-size:2.1rem; letter-spacing:.06em; color:var(--brown-dark); margin-top:20px;
+  }
+  .script{
+    font-family:"Playfair Display",Georgia,serif; font-style:italic; font-weight:500;
+    color:var(--brown); font-size:1.15rem; line-height:1.2; margin-top:4px;
+  }
+  .rule{width:60px; height:1.5px; background:var(--rose); margin:16px 0 0}
+  .cta{
+    text-align:center; text-transform:uppercase; letter-spacing:.14em;
+    font-size:.74rem; font-weight:600; color:var(--muted); line-height:1.6;
+    margin:16px 0 22px;
+  }
+
+  /* ---------- botões ---------- */
+  .links{list-style:none; width:100%; max-width:340px; display:flex; flex-direction:column; gap:14px}
+  .btn{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    width:100%; min-height:56px; padding:0 60px;
+    border:0; border-radius:999px; cursor:pointer;
+    background:linear-gradient(100deg,var(--brown-dark) 0%,var(--brown) 55%,var(--rose) 100%);
+    color:#fff; text-decoration:none; font:inherit;
+    font-size:.95rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    box-shadow:0 6px 16px rgba(111,75,60,.28), inset 0 -3px 0 rgba(0,0,0,.1);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:scale(.97); box-shadow:0 3px 8px rgba(111,75,60,.28)}
+  .btn:focus-visible{outline:3px solid var(--brown-dark); outline-offset:3px}
+  .btn .ico{
+    position:absolute; left:7px; top:50%; transform:translateY(-50%);
+    width:42px; height:42px; border-radius:50%; background:var(--card);
+    display:grid; place-items:center; color:var(--brown);
+  }
+  .btn .ico svg{width:22px; height:22px}
+
+  footer{margin-top:30px; font-size:.72rem; color:var(--muted); text-align:center; letter-spacing:.06em}
+
+  /* ---------- modal Pix ---------- */
+  .sheet-bg{
+    position:fixed; inset:0; z-index:10; background:rgba(74,51,41,.55);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .sheet-bg.open{opacity:1; pointer-events:auto}
+  .sheet{
+    width:100%; max-width:480px; background:var(--paper); border-radius:22px 22px 0 0;
+    padding:26px 24px calc(26px + env(safe-area-inset-bottom)); text-align:center;
+    transform:translateY(100%); transition:transform .25s ease;
+  }
+  .sheet-bg.open .sheet{transform:none}
+  .sheet h2{font-family:"Playfair Display",Georgia,serif; font-weight:600; font-size:1.4rem; color:var(--brown-dark)}
+  .sheet p{color:var(--muted); font-size:.9rem; margin-top:6px; line-height:1.45}
+  .key{
+    margin:18px 0 6px; padding:14px; border:2px dashed var(--rose); border-radius:14px;
+    background:var(--card); font-size:1.35rem; font-weight:700; color:var(--brown-dark); letter-spacing:.04em;
+  }
+  .key small{display:block; font-size:.7rem; font-weight:600; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:2px}
+  .sheet .btn{margin-top:16px}
+  .sheet .close{
+    margin-top:12px; background:none; border:0; font:inherit; font-weight:600;
+    color:var(--muted); padding:10px 20px; cursor:pointer; letter-spacing:.08em; text-transform:uppercase; font-size:.82rem;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:calc(28px + env(safe-area-inset-bottom)); z-index:20;
+    transform:translate(-50%,20px); opacity:0; transition:all .25s ease;
+    background:var(--brown-dark); color:#fff; padding:12px 20px; border-radius:999px; font-size:.88rem; font-weight:600;
+    box-shadow:0 8px 20px rgba(74,51,41,.25); white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+
+  @media (max-width:360px){
+    .page{padding:44px 16px 28px}
+    .photo{width:156px;height:156px}
+    h1{font-size:1.8rem}
+    .btn{font-size:.86rem; padding:0 52px}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<main class="page">
+  <!-- fundo decorativo: mancha suave + linha curva + círculos -->
+  <svg class="blob" viewBox="0 0 400 420" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M60 60 C140 -10 300 10 350 80 C400 150 370 250 300 300 C230 350 120 360 70 300 C20 240 -10 120 60 60Z" fill="var(--blob)"/>
+    <path d="M10 170 C60 20 200 -20 330 40 C420 80 410 230 360 330 C320 410 200 430 120 400" fill="none" stroke="var(--rose)" stroke-width="1.2" opacity=".6"/>
+  </svg>
+  <span class="dot a"></span><span class="dot b"></span>
+  <span class="dot c"></span><span class="dot d"></span>
+  <!-- cabides -->
+  <svg class="orn s1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7a2 2 0 1 1 2-2c0 1-2 1.5-2 3v1"/><path d="M12 9L3 16.5a1 1 0 0 0 .6 1.8h16.8a1 1 0 0 0 .6-1.8L12 9z"/></svg>
+  <svg class="orn s2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7a2 2 0 1 1 2-2c0 1-2 1.5-2 3v1"/><path d="M12 9L3 16.5a1 1 0 0 0 .6 1.8h16.8a1 1 0 0 0 .6-1.8L12 9z"/></svg>
+
+  <div class="content">
+    <div class="photo"><img src="img/logo.png" alt="Logo Zag Modas" width="600" height="600"></div>
+
+    <h1>Zag Modas</h1>
+    <p class="script">A moda dos que vivem</p>
+    <span class="rule" aria-hidden="true"></span>
+
+    <p class="cta">Confira os links abaixo<br>para mais informações!</p>
+
+    <ul class="links">
+      <li>
+        <a class="btn" href="contato.vcf" download="Zag Modas.vcf">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>
+          Salvar contato
+        </a>
+      </li>
+      <li>
+        <button class="btn" type="button" id="pixBtn">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.3 17.2a3 3 0 0 1-2.1-.9l-3-3a.6.6 0 0 0-.8 0l-3 3a3 3 0 0 1-2.2.9H5.6l3.8 3.8a3 3 0 0 0 4.3 0l3.8-3.8h-.2zM6.2 6.8a3 3 0 0 1 2.2.9l3 3a.6.6 0 0 0 .8 0l3-3a3 3 0 0 1 2.1-.9h.2L13.7 3a3 3 0 0 0-4.3 0L5.6 6.8h.6z"/><path d="M21 9.8l-2.3-2.3h-1.4a2 2 0 0 0-1.4.6l-3 3a1.5 1.5 0 0 1-2.1 0l-3-3a2 2 0 0 0-1.4-.6H4.7L3 9.8a3 3 0 0 0 0 4.3l1.7 1.7h1.7a2 2 0 0 0 1.4-.6l3-3a1.5 1.5 0 0 1 2.1 0l3 3a2 2 0 0 0 1.4.6h1.4L21 14.1a3 3 0 0 0 0-4.3z"/></svg></span>
+          Pix
+        </button>
+      </li>
+      <li>
+        <a class="btn" href="https://www.instagram.com/zagmodass/" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+          Instagram
+        </a>
+      </li>
+      <li>
+        <a class="btn" href="https://share.google/eHjguiUz6idRV6Bau" target="_blank" rel="noopener">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2L2.9 9.4l6.3-.9z"/></svg></span>
+          Avalie no Google
+        </a>
+      </li>
+    </ul>
+
+    <footer>© <span id="ano">2026</span> Zag Modas</footer>
+  </div>
+</main>
+
+<!-- Pix -->
+<div class="sheet-bg" id="pixSheet" role="dialog" aria-modal="true" aria-labelledby="pixTitle">
+  <div class="sheet">
+    <h2 id="pixTitle">Pagamento via Pix</h2>
+    <p>Copie a chave e cole no app do seu banco, na opção <b>Pix &rsaquo; Pagar com chave</b>.</p>
+    <div class="key"><small>Chave Pix (celular)</small>(14) 99105-1907</div>
+    <button class="btn" type="button" id="copyPix">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+      Copiar chave
+    </button>
+    <button class="close" type="button" id="closePix">Fechar</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  var PIX_KEY = "+5514991051907";
+
+  var sheet = document.getElementById("pixSheet");
+  var toastEl = document.getElementById("toast");
+  var toastTimer;
+
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 2400);
+  }
+  function openPix(){ sheet.classList.add("open"); document.getElementById("copyPix").focus(); }
+  function closePix(){ sheet.classList.remove("open"); document.getElementById("pixBtn").focus(); }
+
+  function fallbackCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function copyPix(){
+    var done = function(){ toast("Chave Pix copiada!"); };
+    var fail = function(){ fallbackCopy(PIX_KEY) ? done() : toast("Chave: " + PIX_KEY); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(PIX_KEY).then(done, fail);
+    } else { fail(); }
+  }
+
+  document.getElementById("pixBtn").addEventListener("click", openPix);
+  document.getElementById("closePix").addEventListener("click", closePix);
+  document.getElementById("copyPix").addEventListener("click", copyPix);
+  sheet.addEventListener("click", function(e){ if (e.target === sheet) closePix(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && sheet.classList.contains("open")) closePix(); });
+  document.getElementById("ano").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
