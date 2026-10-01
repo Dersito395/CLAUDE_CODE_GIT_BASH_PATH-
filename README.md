@@ -72,3 +72,20 @@ da placa NFC.
 Publicação: a pasta é estática (HTML + imagens). Com GitHub Pages ativo, o
 endereço fica `https://<usuario>.github.io/<repo>/firecommand/` — grave essa URL
 na tag NFC (registro do tipo URL/URI).
+
+---
+
+# Zag Modas — Biosite (`zagmodas/`)
+
+Página de links (biosite) da Zag Modas — "A moda dos que vivem" —, no mesmo
+formato da Fire Command, com as cores do logo (pêssego e marrom).
+
+| Botão | Ação |
+| --- | --- |
+| Salvar contato | Baixa `contato.vcf` — (14) 99105-1907, Instagram e logo |
+| Pix | Abre painel com a chave (14) 99105-1907 e botão "Copiar chave" |
+| Instagram | https://www.instagram.com/zagmodass/ |
+| Avalie no Google | https://share.google/eHjguiUz6idRV6Bau |
+
+Publicação: com GitHub Pages ativo, o endereço fica
+`https://<usuario>.github.io/<repo>/zagmodas/`.
