@@ -274,7 +274,17 @@
 
   if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
     window.addEventListener("load", function(){
-      navigator.serviceWorker.register("sw.js").catch(function(){});
+      // Toda vez que abre com internet, confere se há versão nova publicada.
+      navigator.serviceWorker.register("sw.js")
+        .then(function(reg){ if (navigator.onLine !== false) reg.update().catch(function(){}); })
+        .catch(function(){});
+    });
+    // Quando uma versão nova assume, recarrega uma vez para já mostrá-la.
+    var tinhaVersao = !!navigator.serviceWorker.controller, recarregou = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function(){
+      if (!tinhaVersao || recarregou) return;
+      recarregou = true;
+      location.reload();
     });
   }
 </script>

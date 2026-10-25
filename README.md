@@ -101,4 +101,6 @@ Para instalar no celular:
 - **iPhone (Safari):** botão Compartilhar → *Adicionar à Tela de Início*.
 
 Ao alterar qualquer arquivo da pasta, troque a versão em `CACHE` no `sw.js`
-(ex.: `zagmodas-v2`) para os celulares baixarem a versão nova.
+(ex.: `zagmodas-v4`) para os celulares baixarem a versão nova. A página confere
+se há versão nova toda vez que abre com internet e, quando há, recarrega sozinha
+uma vez para já mostrá-la.
