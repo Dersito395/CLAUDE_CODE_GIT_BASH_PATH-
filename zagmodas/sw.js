@@ -1,7 +1,7 @@
 /* Service worker da Zag Modas.
    Guarda a página, o contato e as imagens no aparelho para a tela inicial
    abrir sem internet. Ao mudar algum arquivo, troque a versão do CACHE. */
-const CACHE = "zagmodas-v2";
+const CACHE = "zagmodas-v3";
 const SHELL = [
   "./",
   "./index.html",
@@ -17,7 +17,9 @@ const SHELL = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.addAll(SHELL))
+      // "reload" ignora a cópia do navegador (o GitHub Pages guarda por 10 min),
+      // para a versão nova não ser montada com arquivos antigos.
+      .then((cache) => cache.addAll(SHELL.map((u) => new Request(u, { cache: "reload" }))))
       .then(() => self.skipWaiting())
   );
 });
