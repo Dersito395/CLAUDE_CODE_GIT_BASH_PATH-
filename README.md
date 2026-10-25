@@ -82,7 +82,7 @@ formato da Fire Command, com as cores do logo (pêssego e marrom).
 
 | Botão | Ação |
 | --- | --- |
-| Salvar contato | Baixa `contato.vcf` — (14) 99105-1907, Instagram e logo |
+| Salvar contato | Abre `contato.vcf` — (14) 99105-1907, Instagram e logo. No iPhone mostra direto "Criar Novo Contato"; no Android baixa o arquivo e o toque em *Abrir* leva aos Contatos |
 | Pix | Abre painel com a chave (14) 99105-1907 e botão "Copiar chave" |
 | Instagram | https://www.instagram.com/zagmodass/ |
 | Avalie no Google | https://share.google/eHjguiUz6idRV6Bau |
