@@ -77,30 +77,9 @@ na tag NFC (registro do tipo URL/URI).
 
 # Zag Modas — Biosite (`zagmodas/`)
 
-Página de links (biosite) da Zag Modas — "A moda dos que vivem" —, no mesmo
-formato da Fire Command, com as cores do logo (pêssego e marrom).
+O biosite da Zag Modas mudou para **https://zagmodas.github.io** (repositório
+`zagmodas/zagmodas`). A pasta `zagmodas/` daqui só redireciona para lá:
 
-| Botão | Ação |
-| --- | --- |
-| Salvar contato | Abre `contato.vcf` — (14) 99105-1907, Instagram e logo. No iPhone mostra direto "Criar Novo Contato"; no Android baixa o arquivo e o toque em *Abrir* leva aos Contatos |
-| Pix | Abre painel com a chave (14) 99105-1907 e botão "Copiar chave" |
-| Instagram | https://www.instagram.com/zagmodass/ |
-| Avalie no Google | https://share.google/eHjguiUz6idRV6Bau |
-
-Publicação: com GitHub Pages ativo, o endereço fica
-`https://<usuario>.github.io/<repo>/zagmodas/`.
-
-**Funciona sem internet.** A página é um app instalável (`manifest.webmanifest`)
-com service worker (`sw.js`) que guarda a página, o contato e as imagens no
-aparelho. Depois de abrir uma vez com internet, a tela inicial, o painel do Pix
-e o "Salvar contato" funcionam offline; Instagram e Google avisam que precisam
-de conexão.
-
-Para instalar no celular:
-- **Android (Chrome):** menu ⋮ → *Instalar app* (ou *Adicionar à tela inicial*).
-- **iPhone (Safari):** botão Compartilhar → *Adicionar à Tela de Início*.
-
-Ao alterar qualquer arquivo da pasta, troque a versão em `CACHE` no `sw.js`
-(ex.: `zagmodas-v4`) para os celulares baixarem a versão nova. A página confere
-se há versão nova toda vez que abre com internet e, quando há, recarrega sozinha
-uma vez para já mostrá-la.
+- `index.html` leva quem abrir o endereço antigo (ou a placa NFC antiga) para o novo;
+- `sw.js` substitui o service worker antigo nos celulares que instalaram o app:
+  apaga o cache, se remove e abre o endereço novo.
