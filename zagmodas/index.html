@@ -169,7 +169,7 @@
 
     <ul class="links">
       <li>
-        <a class="btn" href="contato.vcf" download="Zag Modas.vcf">
+        <a class="btn" href="contato.vcf" id="vcfBtn">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>
           Salvar contato
         </a>
@@ -253,6 +253,14 @@
   sheet.addEventListener("click", function(e){ if (e.target === sheet) closePix(); });
   document.addEventListener("keydown", function(e){ if (e.key === "Escape" && sheet.classList.contains("open")) closePix(); });
   document.getElementById("ano").textContent = new Date().getFullYear();
+
+  // Salvar contato: no iPhone o link abre direto a ficha "Criar Novo Contato".
+  // O Android sempre baixa o .vcf; ali damos um nome ao arquivo e explicamos o próximo toque.
+  if (/Android/i.test(navigator.userAgent)) {
+    var vcfBtn = document.getElementById("vcfBtn");
+    vcfBtn.setAttribute("download", "Zag Modas.vcf");
+    vcfBtn.addEventListener("click", function(){ toast("Toque em Abrir para salvar o contato"); });
+  }
 
   // Sem internet: a página abre do cache, mas Instagram e Google precisam de conexão.
   Array.prototype.forEach.call(document.querySelectorAll('a[target="_blank"]'), function(a){
