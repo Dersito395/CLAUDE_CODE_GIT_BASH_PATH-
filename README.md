@@ -89,3 +89,16 @@ formato da Fire Command, com as cores do logo (pêssego e marrom).
 
 Publicação: com GitHub Pages ativo, o endereço fica
 `https://<usuario>.github.io/<repo>/zagmodas/`.
+
+**Funciona sem internet.** A página é um app instalável (`manifest.webmanifest`)
+com service worker (`sw.js`) que guarda a página, o contato e as imagens no
+aparelho. Depois de abrir uma vez com internet, a tela inicial, o painel do Pix
+e o "Salvar contato" funcionam offline; Instagram e Google avisam que precisam
+de conexão.
+
+Para instalar no celular:
+- **Android (Chrome):** menu ⋮ → *Instalar app* (ou *Adicionar à tela inicial*).
+- **iPhone (Safari):** botão Compartilhar → *Adicionar à Tela de Início*.
+
+Ao alterar qualquer arquivo da pasta, troque a versão em `CACHE` no `sw.js`
+(ex.: `zagmodas-v2`) para os celulares baixarem a versão nova.
