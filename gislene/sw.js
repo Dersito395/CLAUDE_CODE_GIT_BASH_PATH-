@@ -1,7 +1,7 @@
 /* Service worker da Gislene Giorgette.
    Guarda a página, o contato e as imagens no aparelho para a tela inicial
    abrir sem internet. Ao mudar algum arquivo, troque a versão do CACHE. */
-const CACHE = "gislene-v1";
+const CACHE = "gislene-v2";
 const SHELL = [
   "./",
   "./index.html",

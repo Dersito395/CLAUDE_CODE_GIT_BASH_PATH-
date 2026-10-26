@@ -2,11 +2,11 @@
 
 Página de links de **Gislene Giorgette** — *Análise técnica contratual &
 cerimonial*. *A segurança que o seu contrato precisa, a cerimônia que o seu amor
-merece.* Endereço: **https://[org].github.io**
+merece.* Endereço: **https://gislenecerimonial.github.io**
 
 | Botão | Ação |
 | --- | --- |
-| Salvar contato | Abre `contato.vcf` — (14) 93300-7561, Instagram e logo. No iPhone mostra direto "Criar Novo Contato"; no Android baixa o arquivo e o toque em *Abrir* leva aos Contatos |
+| Salvar contato | Abre `contato.vcf` — nome "Gislene Giorgette - Cerimonial", (14) 93300-7561, Instagram, logo e o lema nas notas. No iPhone mostra direto "Criar Novo Contato"; no Android baixa o arquivo e o toque em *Abrir* leva aos Contatos |
 | Instagram | https://www.instagram.com/gislene_cerimonialista/ |
 | WhatsApp | https://wa.me/5514933007561 — (14) 93300-7561 |
 
@@ -30,4 +30,4 @@ internet e, quando há, recarrega sozinha uma vez para já mostrá-la.
 ## Publicação
 
 GitHub Pages a partir do branch `main`, pasta `/ (root)`. O repositório precisa
-ser **público** e se chamar `[org].github.io` para o endereço ficar na raiz.
+ser **público** e se chamar `gislenecerimonial.github.io` para o endereço ficar na raiz.
